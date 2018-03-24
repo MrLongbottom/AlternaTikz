@@ -11,6 +11,7 @@ import java.util.Map;
 public class Scanner {
     private Map<String,Integer> lookup = new HashMap<>();
     private char[] userProgram;
+    private int line = 1;
 
     public List<Triplet<String, String, Integer>> scan(String inputProgram){
         int index = 0;
@@ -54,33 +55,37 @@ public class Scanner {
         //ID => 26
         //STRING => 27
 
-        lookup.put("(",30);
-        lookup.put(")",31);
-        lookup.put(".",32);
-        lookup.put(";",33);
-        lookup.put("[",34);
-        lookup.put("]",35);
-        lookup.put("{",36);
-        lookup.put("}",37);
-        lookup.put(",",38);
-        lookup.put("-",39);
-        lookup.put("+",40);
-        lookup.put("*",41);
-        lookup.put("/",42);
-        lookup.put("%",43);
-        lookup.put("&&",44);
-        lookup.put("||",45);
-        lookup.put("++",46);
-        lookup.put("--",47);
-        lookup.put("<=",48);
-        lookup.put(">=",49);
-        lookup.put("==",50);
-        lookup.put("!=",51);
-        lookup.put("+=",52);
-        lookup.put("-=",53);
-        lookup.put("*=",54);
-        lookup.put("/=",55);
-        lookup.put("=",56);
+
+        lookup.put("=",30);     //X
+        lookup.put("(",31);     //X
+        lookup.put(")",32);     //X
+        lookup.put(".",33);     //X
+        lookup.put(";",34);     //X
+        lookup.put("[",35);     //X
+        lookup.put("]",36);     //X
+        lookup.put("{",37);     //X
+        lookup.put("}",38);     //X
+        lookup.put(",",39);     //X
+        lookup.put("-",40);     //X
+        lookup.put("+",41);     //X
+        lookup.put("*",42);     //X
+        lookup.put("/",43);     //X
+        lookup.put("%",44);     //X
+        lookup.put("<",45);     //X
+        lookup.put(">",46);     //X
+        lookup.put("!",47);     //
+        lookup.put("&&",48);    //X
+        lookup.put("||",49);    //X
+        lookup.put("++",50);    //X
+        lookup.put("--",51);    //X
+        lookup.put("<=",52);    //X
+        lookup.put(">=",53);    //X
+        lookup.put("==",54);    //X
+        lookup.put("!=",55);    //
+        lookup.put("+=",56);    //X
+        lookup.put("-=",57);    //X
+        lookup.put("*=",58);    //X
+        lookup.put("/=",59);    //X
 
         //UNKNOWN => 99
     }
@@ -100,16 +105,125 @@ public class Scanner {
 
         switch(userProgram[i]){
             case '(':
-                id = lookup.get('(');
+                id = lookup.get("(");
                 break;
             case ')':
-                id = lookup.get(')');
+                id = lookup.get(")");
                 break;
             case '.':
-                id = lookup.get('.');
+                id = lookup.get(".");
                 break;
-            case ';':
-                id = lookup.get(';');
+            case ';':                   //TODO: Mangler at tage højde for om det er inde i et for loop.
+                id = lookup.get(";");
+                line++;
+                break;
+            case '[':
+                id = lookup.get("[");
+                break;
+            case ']':
+                id = lookup.get("]");
+                break;
+            case '{':
+                id = lookup.get("{");
+                break;
+            case '}':
+                id = lookup.get("}");
+                break;
+            case ',':
+                id = lookup.get(",");
+                break;
+            case '-':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '-')
+                    id = lookup.get("--");
+                else if(userProgram[i] == '=')
+                    id = lookup.get("-=");
+                else{
+                    id = lookup.get("-");
+                    i--;
+                }
+                break;
+            case '+':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '+')
+                    id = lookup.get("++");
+                else if(userProgram[i] == '=')
+                    id = lookup.get("+=");
+                else{
+                    id = lookup.get("+");
+                    i--;
+                }
+                break;
+            case '*':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '=')
+                    id = lookup.get("*=");
+                else{
+                    id = lookup.get("*");
+                    i--;
+                }
+                break;
+            case '/':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '=')
+                    id = lookup.get("/=");
+                else{
+                    id = lookup.get("/");
+                    i--;
+                }
+                break;
+            case '%':
+                id = lookup.get("%");
+                break;
+            case '=':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '=')
+                    id = lookup.get("==");
+                else{
+                    id = lookup.get("=");
+                    i--;
+                }
+                break;
+            case '<':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '<')
+                    id = lookup.get("<=");
+                else{
+                    id = lookup.get("<");
+                    i--;
+                }
+                break;
+            case '>':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '=')
+                    id = lookup.get(">=");
+                else{
+                    id = lookup.get(">");
+                    i--;
+                }
+                break;
+            case '!':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '=')
+                    id = lookup.get("!=");
+                else{
+                    id = lookup.get("!");
+                    i--;
+                }
+                break;
+            case '&':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '&')
+                    id = lookup.get("&&");
+                else
+                    throw new SyntaxException("Expected operator \"&&\"", line);
+                break;
+            case '|':
+                i = getNextNonBlankChar(i);
+                if(userProgram[i] == '|')
+                    id = lookup.get("||");
+                else
+                    throw new SyntaxException("Expected operator \"||\"", line);
                 break;
             default:
                 break;
